@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FFF7EC">
+<title>Anu's Reading Words+</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF7EC;
+    --paper2:#FFE9CF;
+    --ink:#33294A;
+    --ink-soft:#6B5F82;
+    --card:#FFFFFF;
+    --go:#2DAE6E;          /* "I read it" green */
+    --go-dark:#21925B;
+    --help:#FB9134;        /* "Help me" amber */
+    --help-dark:#E07A1C;
+    --pink:#FF5C8A;
+    --purple:#7C5CFF;
+    --sky:#3FBFE0;
+    --shadow:0 14px 0 rgba(51,41,74,.10), 0 22px 40px rgba(51,41,74,.16);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Fredoka',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, #FFFDF8 0%, var(--paper) 45%, var(--paper2) 100%) fixed;
+    overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+    touch-action:manipulation;
+  }
+  .wrap{
+    height:100%; max-width:560px; margin:0 auto;
+    display:flex; flex-direction:column; padding:14px 16px 20px;
+  }
+
+  /* ---- Top bar ---- */
+  .topbar{display:flex; align-items:center; gap:10px;}
+  .chip{
+    display:flex; align-items:center; gap:6px;
+    background:var(--card); border:3px solid #fff;
+    box-shadow:0 6px 0 rgba(51,41,74,.08), 0 10px 18px rgba(51,41,74,.10);
+    border-radius:999px; padding:8px 14px; font-weight:600; font-size:16px;
+    color:var(--ink);
+  }
+  .chip .lvl-emoji{font-size:18px; line-height:1;}
+  .stars-chip{margin-left:auto; color:#B8860B;}
+  .stars-chip .num{font-weight:700; font-size:18px;}
+  .gear{
+    width:48px; height:48px; flex:0 0 auto; border:none; cursor:pointer;
+    background:var(--card); border-radius:16px;
+    box-shadow:0 6px 0 rgba(51,41,74,.08), 0 10px 18px rgba(51,41,74,.10);
+    font-size:22px; color:var(--ink-soft);
+  }
+  .gear:active{transform:translateY(3px); box-shadow:0 3px 0 rgba(51,41,74,.08);}
+
+  /* ---- Card area ---- */
+  .stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; position:relative;}
+  .prompt{
+    font-size:19px; font-weight:600; color:var(--ink-soft);
+    min-height:26px; text-align:center; letter-spacing:.2px;
+  }
+  .card{
+    width:100%; background:var(--card); border-radius:34px;
+    border:5px solid #fff; box-shadow:var(--shadow);
+    padding:30px 20px 26px; text-align:center; position:relative;
+  }
+  .word{
+    font-family:'Andika', sans-serif;
+    font-weight:700; line-height:1;
+    font-size:clamp(78px, 30vw, 150px);
+    letter-spacing:2px; word-break:break-word;
+  }
+  .word .ltr{display:inline-block; transition:transform .15s ease, color .15s ease;}
+  .word .ltr.lit{color:var(--pink); transform:translateY(-10px) scale(1.12);}
+  .pop{animation:pop .42s cubic-bezier(.2,1.3,.5,1);}
+  @keyframes pop{0%{transform:scale(.4) rotate(-6deg); opacity:0;}60%{transform:scale(1.07) rotate(2deg);}100%{transform:scale(1) rotate(0); opacity:1;}}
+
+  .hear{
+    margin-top:14px; display:inline-flex; align-items:center; gap:9px;
+    border:none; cursor:pointer; background:var(--sky); color:#fff;
+    font-family:'Fredoka'; font-weight:600; font-size:18px;
+    padding:12px 22px; border-radius:999px;
+    box-shadow:0 6px 0 #259cbb;
+  }
+  .hear:active{transform:translateY(4px); box-shadow:0 2px 0 #259cbb;}
+  .hear .ico{font-size:22px;}
+
+  /* ---- Bottom buttons ---- */
+  .actions{display:flex; gap:14px; margin-top:8px;}
+  .big{
+    flex:1; border:none; cursor:pointer; color:#fff;
+    font-family:'Fredoka'; font-weight:700; font-size:22px;
+    padding:22px 10px; border-radius:24px; line-height:1.1;
+  }
+  .big small{display:block; font-weight:500; font-size:14px; opacity:.92; margin-top:3px;}
+  .go{background:var(--go); box-shadow:0 8px 0 var(--go-dark);}
+  .go:active{transform:translateY(5px); box-shadow:0 3px 0 var(--go-dark);}
+  .helpbtn{background:var(--help); box-shadow:0 8px 0 var(--help-dark);}
+  .helpbtn:active{transform:translateY(5px); box-shadow:0 3px 0 var(--help-dark);}
+  .said{flex:1; background:var(--purple); box-shadow:0 8px 0 #5a3fd6;}
+  .said:active{transform:translateY(5px); box-shadow:0 3px 0 #5a3fd6;}
+
+  /* ---- Toast / scripture ---- */
+  .toast{
+    position:fixed; left:50%; top:18%; transform:translateX(-50%) translateY(-12px);
+    background:var(--ink); color:#fff; padding:14px 20px; border-radius:18px;
+    font-weight:500; font-size:17px; max-width:88%; text-align:center;
+    box-shadow:0 16px 36px rgba(0,0,0,.28); opacity:0; pointer-events:none;
+    transition:opacity .3s ease, transform .3s ease; z-index:60;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast .ref{display:block; margin-top:5px; font-size:13px; opacity:.7; font-weight:600;}
+
+  /* ---- Confetti ---- */
+  .confetti{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:50;}
+  .conf{position:absolute; font-size:26px; will-change:transform,opacity; animation:fall 1.1s ease-out forwards;}
+  @keyframes fall{0%{transform:translateY(0) scale(.6) rotate(0); opacity:1;}100%{transform:translateY(-220px) scale(1.2) rotate(220deg); opacity:0;}}
+
+  /* ---- Settings modal ---- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(51,41,74,.45);
+    display:none; align-items:center; justify-content:center; padding:20px; z-index:80;
+  }
+  .overlay.open{display:flex;}
+  .sheet{
+    width:100%; max-width:440px; background:var(--card); border-radius:28px;
+    padding:22px; box-shadow:0 30px 60px rgba(0,0,0,.3); max-height:86vh; overflow:auto;
+  }
+  .sheet h2{font-family:'Fredoka'; font-weight:700; margin:0 0 4px; font-size:24px;}
+  .sheet .sub{color:var(--ink-soft); margin:0 0 16px; font-size:15px;}
+  .levels{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .lvlbtn{
+    border:3px solid #EFE7DA; background:#FFFDF8; cursor:pointer;
+    border-radius:16px; padding:12px 10px; text-align:left;
+    font-family:'Fredoka'; font-weight:600; font-size:15px; color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .lvlbtn .e{font-size:20px;}
+  .lvlbtn .ct{display:block; font-size:12px; color:var(--ink-soft); font-weight:500;}
+  .lvlbtn.sel{border-color:var(--go); background:#EAF8F0;}
+  .row{display:flex; gap:10px; margin-top:16px;}
+  .ghost{
+    flex:1; border:3px solid #EFE7DA; background:#fff; cursor:pointer;
+    border-radius:16px; padding:13px; font-family:'Fredoka'; font-weight:600; font-size:15px; color:var(--ink-soft);
+  }
+  .solid{
+    flex:1; border:none; background:var(--ink); color:#fff; cursor:pointer;
+    border-radius:16px; padding:13px; font-family:'Fredoka'; font-weight:700; font-size:16px;
+  }
+  .pinpad{text-align:center;}
+  .pin-dots{font-size:30px; letter-spacing:10px; min-height:40px; color:var(--ink); margin:6px 0 14px;}
+  .keys{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:280px; margin:0 auto;}
+  .key{
+    border:none; background:#FFFDF8; border:3px solid #EFE7DA; cursor:pointer;
+    border-radius:16px; padding:16px 0; font-family:'Fredoka'; font-weight:700; font-size:24px; color:var(--ink);
+  }
+  .key:active{transform:translateY(3px);}
+  .hidden{display:none !important;}
+  .err{color:var(--pink); font-weight:600; min-height:20px; margin-top:8px;}
+
+  /* ---- Say-it (mic) round ---- */
+  .mic{
+    flex:1; border:none; cursor:pointer; color:#fff;
+    font-family:'Fredoka'; font-weight:700; font-size:22px;
+    padding:22px 10px; border-radius:24px; line-height:1.1;
+    background:var(--purple); box-shadow:0 8px 0 #5a3fd6;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .mic:active{transform:translateY(5px); box-shadow:0 3px 0 #5a3fd6;}
+  .mic .ico{font-size:26px;}
+  .mic.listening{background:var(--pink); box-shadow:0 8px 0 #d83f6c; animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+  .say-skip{
+    flex:0 0 auto; border:none; background:transparent; cursor:pointer;
+    font-family:'Fredoka'; font-weight:600; font-size:15px; color:var(--ink-soft);
+    padding:0 14px; text-decoration:underline;
+  }
+  .coach{
+    position:absolute; left:50%; transform:translateX(-50%); bottom:100%;
+    margin-bottom:10px; background:var(--ink); color:#fff; font-size:14px; font-weight:500;
+    padding:9px 14px; border-radius:14px; white-space:nowrap; box-shadow:0 8px 18px rgba(0,0,0,.25);
+  }
+  .coach:after{content:""; position:absolute; left:50%; top:100%; transform:translateX(-50%);
+    border:7px solid transparent; border-top-color:var(--ink);}
+
+  /* ---- Break screen ---- */
+  .break{
+    position:fixed; inset:0; z-index:90; display:none;
+    flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:28px;
+    background:radial-gradient(120% 90% at 50% 0%, #EAFBF1 0%, #Dff3Fb 55%, #E9E6FF 100%);
+  }
+  .break.open{display:flex;}
+  .break .leaf{font-size:64px; margin-bottom:6px;}
+  .break h2{font-family:'Fredoka'; font-weight:700; font-size:30px; margin:4px 0; color:var(--ink);}
+  .break p{color:var(--ink-soft); font-size:17px; margin:0 0 18px; max-width:300px;}
+  .break .count{
+    font-family:'Fredoka'; font-weight:700; font-size:60px; color:var(--purple);
+    background:#fff; border-radius:28px; padding:14px 34px; min-width:200px;
+    box-shadow:0 14px 0 rgba(124,92,255,.18), 0 20px 36px rgba(51,41,74,.14); letter-spacing:1px;
+  }
+  .break .resume{
+    margin-top:24px; border:none; cursor:pointer; color:#fff; background:var(--go);
+    font-family:'Fredoka'; font-weight:700; font-size:22px; padding:18px 40px;
+    border-radius:22px; box-shadow:0 8px 0 var(--go-dark);
+  }
+  .break .resume:active{transform:translateY(5px); box-shadow:0 3px 0 var(--go-dark);}
+  .break .skip{margin-top:20px; border:none; background:transparent; cursor:pointer;
+    font-family:'Fredoka'; font-weight:600; font-size:14px; color:var(--ink-soft); text-decoration:underline;}
+
+  @media (prefers-reduced-motion: reduce){
+    .pop,.conf{animation:none;}
+    .big:active,.gear:active,.hear:active,.said:active{transform:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="chip"><span class="lvl-emoji" id="lvlEmoji">🅰️</span><span id="lvlName">Two Letters</span></div>
+    <div class="chip stars-chip">⭐<span class="num" id="starNum">0</span></div>
+    <button class="gear" id="gearBtn" aria-label="Grown-up settings">⚙️</button>
+  </div>
+
+  <div class="stage">
+    <div class="prompt" id="prompt" aria-live="polite">Read it out loud 👀</div>
+    <div class="card">
+      <div class="word" id="word">cat</div>
+      <button class="hear" id="hearBtn"><span class="ico">🔊</span> Sound it out</button>
+    </div>
+  </div>
+
+  <div class="actions" id="tryActions">
+    <button class="big go" id="gotItBtn">I read it!<small>tap when you said it</small></button>
+    <button class="big helpbtn" id="helpBtn">Help me<small>I'll say it for you</small></button>
+  </div>
+  <div class="actions hidden" id="helpActions">
+    <button class="big said" id="saidItBtn">I said it! ✅<small>now your turn</small></button>
+  </div>
+  <div class="actions hidden" id="sayActions" style="position:relative;">
+    <div class="coach hidden" id="coach">Tap the mic, then say the word 🎤</div>
+    <button class="mic" id="micBtn"><span class="ico">🎤</span><span id="micLabel">Tap &amp; say it</span></button>
+    <button class="say-skip" id="saySkip">Skip ▸</button>
+  </div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+<div class="toast" id="toast"></div>
+
+<!-- Break screen -->
+<div class="break" id="breakScreen">
+  <div class="leaf">🌿</div>
+  <h2>Break time!</h2>
+  <p>Great reading, Anu! Rest your eyes, stretch, and get some water. 💧</p>
+  <div class="count" id="breakCount">10:00</div>
+  <button class="resume hidden" id="breakResume">Let's keep reading ▶️</button>
+  <button class="skip" id="breakSkip">Grown-ups: skip break</button>
+</div>
+
+<!-- Settings -->
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <!-- PIN gate -->
+    <div id="pinView" class="pinpad">
+      <h2>Grown-ups only</h2>
+      <p class="sub">Enter the code to change settings.</p>
+      <div class="pin-dots" id="pinDots"></div>
+      <div class="keys" id="keys"></div>
+      <div class="err" id="pinErr"></div>
+      <div class="row"><button class="ghost" id="pinCancel">Close</button></div>
+    </div>
+    <!-- Settings body -->
+    <div id="setView" class="hidden">
+      <h2>Settings</h2>
+      <p class="sub">Pick a word set for Anu to practice.</p>
+      <div class="levels" id="levelGrid"></div>
+      <div class="row">
+        <button class="ghost" id="resetStars">Reset stars</button>
+        <button class="solid" id="closeSet">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Anu's Reading Words  —  AMHG build
+   Vanilla ES5, Safari / iOS friendly.  Audio via speechSynthesis.
+   ========================================================= */
+(function(){
+  "use strict";
+
+  /* ---------- Word bank (300 real, decodable, kid-safe words) ---------- */
+  var BANK = [
+    {name:"Two Letters", emoji:"🅰️", words:["am","an","as","at","be","by","do","go","he","hi","if","in","is","it","me","my","no","of","oh","on","or","so","to","up","us","we","ox","ax"]},
+    {name:"Short A", emoji:"🍎", words:["bat","cat","fat","hat","mat","pat","rat","sat","vat","ban","can","fan","man","pan","ran","tan","van","cap","gap","lap","map","nap","rap","sap","tap","yap","zap","bag","gag","lag","nag","rag","sag","tag","wag","ad","bad","dad","fad","had","lad","mad","pad","sad","dam","ham","jam","ram","yam","cab","dab","jab","lab","nab","tab","all","and","ash"]},
+    {name:"Short E", emoji:"🥚", words:["bed","fed","led","red","wed","bet","get","jet","let","met","net","pet","set","vet","wet","yet","den","hen","men","pen","ten","beg","leg","peg","egg","end"]},
+    {name:"Short I", emoji:"🐷", words:["bit","fit","hit","kit","lit","pit","sit","wit","big","dig","fig","gig","jig","pig","rig","wig","bin","din","fin","pin","sin","tin","win","dip","hip","lip","nip","rip","sip","tip","zip","bid","did","hid","kid","lid","rid","ill","ink"]},
+    {name:"Short O", emoji:"🦊", words:["cot","dot","got","hot","jot","lot","not","pot","rot","tot","cop","hop","mop","pop","top","bog","cog","dog","fog","hog","jog","log","cob","gob","job","mob","rob","sob","cod","nod","pod","rod","box","fox"]},
+    {name:"Short U", emoji:"☀️", words:["bug","dug","hug","jug","mug","pug","rug","tug","bun","fun","nun","pun","run","sun","but","cut","hut","nut","cub","cup","hub","rub","sub","tub","gum","hum","mum","rum","sum","pup"]},
+    {name:"Sky & Cry", emoji:"🪁", words:["cry","dry","fry","pry","shy","sky","sly","spy","sty","try","wry","fly","why","ply"]},
+    {name:"Long Sounds", emoji:"🌈", words:["bay","day","hay","jay","lay","may","nay","pay","ray","say","way","bee","fee","see","tee","wee","bow","low","mow","row","sow","tow","cow","how","now","wow","boo","coo","goo","moo","too","woo","zoo","ear","eat","aid","aim","air"]},
+    {name:"Sight Words", emoji:"⭐", words:["the","a","i","are","was","you","she","his","her","him","one","two","out","our","who","new","few","saw","yes","has","put","use","ask","add","any","boy","car","eye","far","toy","old","off","own"]},
+    {name:"Magic E", emoji:"✨", words:["cake","lake","make","take","bake","wake","sake","cave","gave","wave","save","name","game","came","fame","tame","same","gate","late","date","hate","mate","gaze","maze","face","race","lace","page","cage","made","fade","wade","safe","tape","cape","sale","tale","pale","male","gale","cane","lane","mane","pane","fate","rate","bale","vane","dale","haze","daze","wage","rake","sane","bike","hike","like","bite","kite","site","mite","dime","time","lime","mime","dive","five","hive","live","ride","side","hide","tide","wide","ripe","wipe","pipe","wine","dine","line","mine","nine","pine","vine","fine","fire","hire","wire","file","mile","pile","tile","life","wife","dice","mice","nice","rice","vice","bile","tire","size","bone","cone","lone","tone","zone","home","dome","nose","rose","hose","pose","hole","mole","pole","role","sole","joke","poke","woke","yoke","bore","core","more","sore","tore","wore","code","mode","node","rode","rope","cope","dope","hope","mope","note","vote","dote","dove","cove","dose","cube","tube","cute","mute","dune","tune","rude","rule","mule","fume","fuse","duke","cure","pure","sure","lure"]},
+    {name:"Blend Start", emoji:"🧱", words:["blot","blob","blip","blab","bled","blew","brag","bran","brim","bred","brew","brow","clap","clip","clop","club","clam","clan","clay","claw","clad","clog","clot","clue","crab","crib","crop","crow","crew","cram","crag","drag","drab","drip","drop","drum","drew","draw","flag","flap","flat","flip","flop","flit","flew","flax","flea","frog","from","fret","free","fray","glad","glob","glow","glum","glue","grab","grad","gram","grim","grin","grip","grub","gray","grew","grow","plan","plot","plop","plug","plum","plus","play","plea","prop","prod","pray","prey","prim","scab","scan","scat","scar","skid","skim","skin","skip","skit","skew","slab","slam","slap","slat","sled","slid","slim","slip","slit","slob","slot","slug","slum","slay","slow","smog","smug","snap","snip","snob","snub","snug","snow","span","spat","sped","spin","spit","spot","spud","spun","spur","stab","stag","stem","step","stir","stop","stub","stun","stay","stew","stow","swam","swap","swim","swum","sway","swan","trap","trim","trip","trod","trot","tray","tree","trek","true","twig","twin","twit","quit","quiz"]},
+    {name:"Strong Endings", emoji:"🏁", words:["camp","damp","lamp","ramp","jump","lump","bump","dump","pump","limp","wimp","romp","band","hand","land","sand","bend","lend","mend","send","tend","bond","fond","pond","fund","find","kind","mind","wind","bent","dent","lent","rent","sent","tent","vent","went","hint","lint","mint","tint","font","hunt","punt","runt","bank","rank","sank","tank","yank","link","mink","pink","rink","sink","wink","bunk","dunk","hunk","junk","sunk","honk","monk","best","nest","pest","rest","test","vest","west","zest","fist","list","mist","fast","last","mast","past","vast","cost","lost","dust","gust","just","must","desk","disk","dusk","husk","mask","task","tusk","risk","gasp","lisp","wisp","wasp","gift","lift","sift","raft","soft","loft","tuft","belt","felt","melt","jolt","bolt","colt","halt","salt","silt","tilt","wilt","hilt","milk","silk","bulk","sulk","hulk","gulp","help","kelp","yelp","pulp","golf","gulf","self","fact","duct","pact"]},
+    {name:"Letter Teams", emoji:"👫", words:["ship","shop","shot","shut","shed","shin","shun","fish","dish","wish","wash","cash","dash","gash","hash","mash","rash","sash","gush","hush","mush","rush","gosh","posh","bash","lush","push","bush","chin","chip","chop","chap","chat","chum","much","such","rich","inch","chew","chow","that","them","then","thin","this","thud","with","bath","math","moth","oath","path","both","thaw","thee","whim","whip","when","whiz","what","whom"]},
+    {name:"Vowel Teams", emoji:"🚣", words:["rain","main","pain","gain","vain","wait","bait","fail","jail","mail","nail","pail","rail","sail","tail","hail","maid","paid","raid","away","seat","neat","beat","heat","meat","bean","dean","lean","mean","bead","lead","read","beak","leak","peak","weak","heal","meal","peal","real","seal","heap","leap","reap","team","beam","east","leaf","year","hear","near","fear","dear","gear","tear","feet","meet","beet","deep","deed","feed","heed","need","reed","seed","weed","beep","jeep","keep","peep","seep","weep","beef","reef","peek","seek","week","peel","feel","heel","keel","reel","been","seen","teen","keen","deer","beer","peer","jeer","leer","boat","coat","goat","moat","road","toad","load","foam","roam","soap","soak","coal","goal","coax","book","cook","hook","look","took","nook","boom","room","zoom","doom","loom","food","mood","good","hood","wood","foot","hoot","root","boot","toot","loot","moon","noon","soon","pool","cool","fool","tool","wool","roof","hoof","show","flow","blow","know","down","town","gown"]},
+    {name:"Bossy R", emoji:"🦜", words:["barn","cart","card","hard","lard","yard","dark","mark","park","bark","lark","harm","farm","arch","star","harp","tart","part","dart","mart","arms","cars","born","corn","horn","torn","worn","cord","ford","fork","pork","cork","fort","port","sort","word","work","worm","herd","term","fern","perk","jerk","bird","dirt","girl","firm","burn","turn","curl","hurt","surf","curb","turf","purr"]},
+  ];
+  var EVERYTHING = {name:"Everything", emoji:"🌟", words:[]};
+  for (var b=0;b<BANK.length;b++){ EVERYTHING.words = EVERYTHING.words.concat(BANK[b].words); }
+
+  /* ---------- Tiny safe storage (works in preview, persists when deployed) ---------- */
+  function load(key, dflt){
+    try { var v = window.localStorage.getItem(key); return v===null ? dflt : v; }
+    catch(e){ return dflt; }
+  }
+  function save(key, val){
+    try { window.localStorage.setItem(key, val); } catch(e){}
+  }
+
+  /* ---------- State ---------- */
+  var PIN = "2020";
+  var stars = parseInt(load("anu_stars","0"),10) || 0;
+  var levelIndex = parseInt(load("anu_level","0"),10);
+  if (isNaN(levelIndex) || levelIndex < 0 || levelIndex > BANK.length) levelIndex = 0;
+  var queue = [];
+  var qi = 0;
+  var mode = "try";        // "try" | "help"
+  var speaking = false;
+  var seq = 0;             // sequence id: bumped whenever the word or audio changes
+
+  /* ---------- Plus: cycle + speech-recognition config ---------- */
+  var WORDS_PER_CYCLE = 10;            // read this many, then a "say it" round
+  var BREAK_MS = 10 * 60 * 1000;       // 10-minute rest after each round
+  var wordsDone = 0;                   // completed words in the current cycle
+  var recentWords = [];                // words from this cycle (say-it picks one)
+  var sayTarget = "";                  // current say-it word
+  var sayTries = 0;
+  var pinPurpose = "settings";         // "settings" | "skipbreak"
+  var breakInterval = null;
+  var coachShown = false;
+
+  var Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recogSupported = !!Recog;
+  var recog = null, recognizing = false, micDenied = false, listenTimer = null;
+
+  // Words too ambiguous for a recognizer to score fairly — still practiced,
+  // just never chosen as the "say it" target.
+  var SKIP_SAYIT = {a:1,i:1,oh:1,ax:1,ox:1,aw:1,eh:1,uh:1,hm:1};
+  // Accept close-sounding answers so a 5-year-old isn't fought by homophones.
+  var HOMOPHONES = {
+    to:["too","two"], too:["to","two"], two:["to","too"],
+    "for":["four","fore"], four:["for","fore"],
+    by:["buy","bye"], buy:["by","bye"],
+    be:["bee"], bee:["be"], no:["know"], know:["no"],
+    or:["oar","ore"], hi:["high"], high:["hi"], "in":["inn"], inn:["in"],
+    we:["wee"], wee:["we"], see:["sea"], sea:["see"], hear:["here"], here:["hear"],
+    one:["won"], won:["one"], red:["read"], road:["rode"], rode:["road"],
+    sun:["son"], son:["sun"], maid:["made"], made:["maid"],
+    tail:["tale"], sail:["sale"], mail:["male"], beat:["beet"],
+    deer:["dear"], dear:["deer"], meat:["meet"], meet:["meat"], week:["weak"], weak:["week"]
+  };
+
+  /* ---------- Elements ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var wordEl = $("word"), promptEl = $("prompt");
+  var lvlNameEl = $("lvlName"), lvlEmojiEl = $("lvlEmoji"), starNumEl = $("starNum");
+  var tryActions = $("tryActions"), helpActions = $("helpActions");
+  var sayActions = $("sayActions");
+
+  /* ---------- Speech ---------- */
+  var voice = null;
+  function loadVoice(){
+    try{
+      var vs = window.speechSynthesis.getVoices();
+      if (!vs || !vs.length) return;
+      var pick = null, i;
+      for (i=0;i<vs.length;i++){ if (/en[-_]US/i.test(vs[i].lang) && /female|samantha|karen|victoria|zira|google us/i.test(vs[i].name)){ pick = vs[i]; break; } }
+      if (!pick) for (i=0;i<vs.length;i++){ if (/^en/i.test(vs[i].lang)){ pick = vs[i]; break; } }
+      voice = pick || vs[0];
+    }catch(e){}
+  }
+  if ("speechSynthesis" in window){
+    loadVoice();
+    window.speechSynthesis.onvoiceschanged = loadVoice;
+  }
+  function speak(text, rate, cb){
+    if (!("speechSynthesis" in window) || !text){ if(cb) cb(); return; }
+    try{
+      var synth = window.speechSynthesis;
+      // Only cancel if something is actually queued/playing. Cancelling an idle
+      // engine is what makes iOS Safari silently drop the next word.
+      if (synth.speaking || synth.pending){ synth.cancel(); }
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = rate || 0.82; u.pitch = 1.08; u.volume = 1;
+      u.lang = "en-US";
+      if (voice) u.voice = voice;
+      u.onend = function(){ speaking=false; if(cb) cb(); };
+      u.onerror = function(){ speaking=false; if(cb) cb(); };
+      speaking = true;
+      synth.speak(u);
+      // iOS sometimes parks the engine paused; nudge it awake.
+      if (synth.paused){ synth.resume(); }
+    }catch(e){ speaking=false; if(cb) cb(); }
+  }
+
+  // Stop any audio and invalidate the current sound-it-out sequence.
+  function stopSpeech(){
+    try{ var s = window.speechSynthesis; if (s && (s.speaking || s.pending)){ s.cancel(); } }catch(e){}
+    speaking = false;
+    seq++;
+  }
+
+  /* ---------- Build / shuffle queue ---------- */
+  function currentLevel(){ return levelIndex >= BANK.length ? EVERYTHING : BANK[levelIndex]; }
+  function shuffle(arr){
+    var a = arr.slice(), i, j, t;
+    for (i=a.length-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+  function buildQueue(){ queue = shuffle(currentLevel().words); qi = 0; }
+
+  /* ---------- Render ---------- */
+  function renderHeader(){
+    var L = currentLevel();
+    lvlNameEl.textContent = L.name;
+    lvlEmojiEl.textContent = L.emoji;
+    starNumEl.textContent = stars;
+  }
+  function paintWord(w){
+    seq++;                 // cancel any spell sequence tied to the previous word
+    // Size the word to its length so 4-letter words stay on one line on phones.
+    wordEl.style.fontSize = w.length >= 4 ? "clamp(56px,17vw,108px)"
+                          : (w.length === 3 ? "clamp(76px,26vw,140px)"
+                          : "clamp(88px,32vw,150px)");
+    wordEl.innerHTML = "";
+    for (var i=0;i<w.length;i++){
+      var s = document.createElement("span");
+      s.className = "ltr"; s.textContent = w.charAt(i);
+      wordEl.appendChild(s);
+    }
+    wordEl.classList.remove("pop"); void wordEl.offsetWidth; wordEl.classList.add("pop");
+  }
+  function renderWord(){
+    paintWord(queue[qi]);
+    setTryMode();
+  }
+  function setTryMode(){
+    mode = "try";
+    promptEl.textContent = "Read it out loud 👀";
+    tryActions.classList.remove("hidden");
+    helpActions.classList.add("hidden");
+    sayActions.classList.add("hidden");
+  }
+  function setHelpMode(){
+    mode = "help";
+    promptEl.textContent = "Say it with me! 🗣️";
+    tryActions.classList.add("hidden");
+    helpActions.classList.remove("hidden");
+    sayActions.classList.add("hidden");
+  }
+  function setSayMode(){
+    mode = "say";
+    promptEl.textContent = "🎤 Say this word!";
+    tryActions.classList.add("hidden");
+    helpActions.classList.add("hidden");
+    sayActions.classList.remove("hidden");
+  }
+
+  /* ---------- Sound it out: highlight each letter in time with audio ---------- */
+  function clearLit(){
+    var ls = wordEl.getElementsByClassName("ltr");
+    for (var i=0;i<ls.length;i++) ls[i].classList.remove("lit");
+  }
+  function spellOut(word, done){
+    var w = word || queue[qi];
+    var ls = wordEl.getElementsByClassName("ltr");
+    var mine = ++seq;      // claim this sequence; any newer word/tap cancels it
+    clearLit();
+    var i = 0;
+    function step(){
+      if (mine !== seq){ clearLit(); return; }       // a newer action took over
+      if (i < w.length){
+        if (!ls[i]){ return; }                        // spans changed under us; bail safely
+        clearLit();
+        ls[i].classList.add("lit");
+        speak(w.charAt(i), 0.6, function(){ if (mine !== seq) return; i++; setTimeout(step, 130); });
+      } else {
+        for (var k=0;k<ls.length;k++){ if (ls[k]) ls[k].classList.add("lit"); }
+        speak(w, 0.78, function(){ if (mine !== seq) return; setTimeout(function(){ if (mine === seq) clearLit(); if(done) done(); }, 250); });
+      }
+    }
+    step();
+  }
+
+  /* ---------- Celebrate ---------- */
+  var CHEERS = ["Wonderful!","You did it!","Great reading!","You're a star!","Way to go!","Brilliant!","So smart!","Yay, Anu!","Amazing!","God made you so clever!"];
+  var SCRIPTURE = [
+    {t:"Your word is a lamp to my feet.", r:"Psalm 119:105"},
+    {t:"I am wonderfully made!", r:"Psalm 139:14"},
+    {t:"I can do all things through Christ.", r:"Philippians 4:13"},
+    {t:"Children are a gift from the Lord.", r:"Psalm 127:3"},
+    {t:"Let the little children come to Me.", r:"Matthew 19:14"}
+  ];
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function confetti(){
+    if (reduced) return;
+    var box = $("confetti");
+    var emojis = ["⭐","🌟","✨","🎉","💛","🌈"];
+    for (var i=0;i<16;i++){
+      var c = document.createElement("span");
+      c.className = "conf";
+      c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      c.style.left = (10 + Math.random()*80) + "%";
+      c.style.bottom = (20 + Math.random()*30) + "%";
+      c.style.animationDelay = (Math.random()*0.18) + "s";
+      c.style.fontSize = (20 + Math.random()*18) + "px";
+      box.appendChild(c);
+      (function(node){ setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); }, 1300); })(c);
+    }
+  }
+  var toastTimer = null;
+  function toast(text, ref){
+    var t = $("toast");
+    t.innerHTML = text + (ref ? '<span class="ref">— ' + ref + '</span>' : "");
+    t.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, ref ? 3200 : 1500);
+  }
+  function awardStar(){
+    stars++; save("anu_stars", String(stars)); starNumEl.textContent = stars;
+    confetti();
+    if (stars % 10 === 0){
+      var sc = SCRIPTURE[Math.floor((stars/10 - 1)) % SCRIPTURE.length];
+      toast(sc.t, sc.r);
+      speak("Ten stars! " + CHEERS[Math.floor(Math.random()*CHEERS.length)], 0.95);
+    } else {
+      var cheer = CHEERS[Math.floor(Math.random()*CHEERS.length)];
+      toast(cheer);
+      speak(cheer, 0.98);
+    }
+  }
+
+  /* ---------- Next word ---------- */
+  function next(){
+    qi++;
+    if (qi >= queue.length){
+      buildQueue();
+      toast("Great job! Let's go again 🔁");
+    }
+    renderWord();
+  }
+
+  /* ---------- Cycle: complete a word, then every 10 → say-it → break ---------- */
+  function completeWord(){
+    if (mode !== "try" && mode !== "help") return;   // ignore taps outside the read flow
+    mode = "wait";                                    // debounce: block a second tap until next render
+    var w = queue[qi];
+    stopSpeech();
+    awardStar();
+    recentWords.push(w);
+    wordsDone++;
+    setTimeout(function(){
+      if (wordsDone >= WORDS_PER_CYCLE){ startSayIt(); }
+      else { next(); }
+    }, 650);
+  }
+
+  /* ---------- Say-it (mic) round ---------- */
+  function normalize(s){ return (s||"").toLowerCase().replace(/[^a-z]/g," ").replace(/\s+/g," ").trim(); }
+  function recognizable(w){ return !SKIP_SAYIT[w.toLowerCase()] && /^[a-z]+$/i.test(w); }
+  function saysMatch(transcript, target){
+    var heard = normalize(transcript);
+    if (!heard) return false;
+    var tg = target.toLowerCase();
+    var ok = HOMOPHONES[tg] || [];
+    var parts = heard.split(" ");
+    for (var i=0;i<parts.length;i++){
+      if (parts[i] === tg) return true;
+      for (var j=0;j<ok.length;j++){ if (parts[i] === ok[j]) return true; }
+    }
+    return heard === tg;
+  }
+  function setMicLabel(txt, listening){
+    $("micLabel").textContent = txt;
+    if (listening){ $("micBtn").classList.add("listening"); }
+    else { $("micBtn").classList.remove("listening"); }
+  }
+  function startSayIt(){
+    if (!recogSupported || micDenied){ startBreak(); return; }   // no mic → just rest
+    var pool = [];
+    for (var i=0;i<recentWords.length;i++){ if (recognizable(recentWords[i])) pool.push(recentWords[i]); }
+    if (!pool.length){ startBreak(); return; }
+    sayTarget = pool[Math.floor(Math.random()*pool.length)];
+    sayTries = 0;
+    paintWord(sayTarget);
+    setSayMode();
+    setMicLabel("Tap & say it", false);
+    if (!coachShown){ $("coach").classList.remove("hidden"); coachShown = true; }
+    speak("Can you say this word?", 0.95);
+  }
+  function listen(){
+    if (!recog || recognizing) return;
+    $("coach").classList.add("hidden");
+    promptEl.textContent = "🎤 Listening…";
+    setMicLabel("Listening…", true);
+    try { recog.start(); recognizing = true; }
+    catch(e){ /* start() throws if already running; ignore */ }
+    if (listenTimer) clearTimeout(listenTimer);
+    listenTimer = setTimeout(function(){ try{ recog.stop(); }catch(e){} }, 7000);
+  }
+  function sayItWin(){
+    setMicLabel("Tap & say it", false);
+    promptEl.textContent = "🎤 Say this word!";
+    awardStar();
+    speak("Yes! You said " + sayTarget + "!", 0.95);
+    toast("Perfect! 🎉");
+    setTimeout(startBreak, 1500);
+  }
+  function sayItMiss(){
+    sayTries++;
+    setMicLabel("Tap & say it", false);
+    if (sayTries >= 2){ sayItTogether(); return; }
+    promptEl.textContent = "Let's try again 🎤";
+    speak("Let's try again", 0.95, function(){ setTimeout(listen, 300); });
+  }
+  function sayItTogether(){
+    promptEl.textContent = "Let's say it together! 🗣️";
+    setMicLabel("Tap & say it", false);
+    var w = sayTarget;
+    speak("Let's say it together.", 0.95, function(){
+      spellOut(w, function(){
+        awardStar();                       // a star for trying
+        toast("Good trying! ⭐");
+        setTimeout(startBreak, 900);
+      });
+    });
+  }
+  function micUnavailable(){
+    micDenied = true;
+    toast("Microphone is off — we'll keep tapping 👍");
+    setTimeout(startBreak, 1300);
+  }
+  function initRecog(){
+    if (!recogSupported) return;
+    recog = new Recog();
+    recog.lang = "en-US";
+    recog.interimResults = false;
+    recog.maxAlternatives = 6;
+    recog.continuous = false;
+    recog.onresult = function(e){
+      recognizing = false;
+      if (listenTimer) clearTimeout(listenTimer);
+      if (mode !== "say") return;
+      var matched = false;
+      try {
+        var res = e.results[0];
+        for (var j=0;j<res.length;j++){ if (saysMatch(res[j].transcript, sayTarget)){ matched = true; break; } }
+      } catch(err){}
+      if (matched) sayItWin(); else sayItMiss();
+    };
+    recog.onerror = function(e){
+      recognizing = false;
+      if (listenTimer) clearTimeout(listenTimer);
+      if (mode !== "say") return;
+      if (e.error === "not-allowed" || e.error === "service-not-allowed"){ micUnavailable(); return; }
+      if (e.error === "aborted"){ setMicLabel("Tap & say it", false); return; }
+      if (e.error === "no-speech"){ sayItMiss(); return; }
+      sayItTogether();   // network/other → don't punish a child
+    };
+    recog.onend = function(){
+      recognizing = false;
+      $("micBtn").classList.remove("listening");
+      if ($("micLabel").textContent === "Listening…"){ $("micLabel").textContent = "Tap & say it"; }
+      if (mode === "say" && promptEl.textContent === "🎤 Listening…"){ promptEl.textContent = "🎤 Tap the mic and say it!"; }
+    };
+  }
+
+  /* ---------- Break ---------- */
+  function fmt(ms){
+    if (ms < 0) ms = 0;
+    var total = Math.round(ms/1000);
+    var m = Math.floor(total/60), s = total % 60;
+    return m + ":" + (s < 10 ? "0"+s : s);
+  }
+  function startBreak(){
+    stopSpeech();
+    wordsDone = 0; recentWords = [];
+    var until = Date.now() + BREAK_MS;
+    save("anu_break_until", String(until));
+    showBreak(until);
+  }
+  function showBreak(until){
+    mode = "break";
+    $("breakResume").classList.add("hidden");
+    $("breakScreen").classList.add("open");
+    if (breakInterval) clearInterval(breakInterval);
+    function tick(){
+      var ms = until - Date.now();
+      $("breakCount").textContent = fmt(ms);
+      if (ms <= 0){
+        clearInterval(breakInterval); breakInterval = null;
+        $("breakCount").textContent = "0:00";
+        $("breakResume").classList.remove("hidden");
+        speak("Break is over! Ready to read?", 0.95);
+      }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function endBreak(){
+    if (breakInterval){ clearInterval(breakInterval); breakInterval = null; }
+    save("anu_break_until", "0");
+    $("breakScreen").classList.remove("open");
+    next();
+  }
+
+  /* ---------- Events: main loop ---------- */
+  $("gotItBtn").addEventListener("click", completeWord);
+  $("helpBtn").addEventListener("click", function(){
+    stopSpeech();
+    setHelpMode();
+    var mySeq = seq;
+    var w = queue[qi];
+    speak(w, 0.78, function(){
+      if (mySeq !== seq) return;                         // word changed; don't spell the old one
+      setTimeout(function(){ if (mySeq === seq) spellOut(); }, 200);
+    });
+  });
+  $("saidItBtn").addEventListener("click", completeWord);
+  $("hearBtn").addEventListener("click", function(){
+    stopSpeech();
+    spellOut();
+  });
+  $("micBtn").addEventListener("click", function(){ if (mode === "say") listen(); });
+  $("saySkip").addEventListener("click", function(){
+    if (recognizing){ try{ recog.abort(); }catch(e){} recognizing = false; }
+    startBreak();
+  });
+  $("breakResume").addEventListener("click", endBreak);
+  $("breakSkip").addEventListener("click", function(){ pinPurpose = "skipbreak"; openSettings(); });
+
+  /* ---------- Settings + PIN ---------- */
+  var pinEntry = "";
+  function renderPinDots(){
+    var d = ""; for (var i=0;i<pinEntry.length;i++) d += "●";
+    $("pinDots").textContent = d;
+  }
+  function buildKeys(){
+    var keys = $("keys"); keys.innerHTML = "";
+    var labels = ["1","2","3","4","5","6","7","8","9","⌫","0","OK"];
+    for (var i=0;i<labels.length;i++){
+      (function(lbl){
+        var k = document.createElement("button");
+        k.className = "key"; k.textContent = lbl;
+        k.addEventListener("click", function(){
+          $("pinErr").textContent = "";
+          if (lbl === "⌫"){ pinEntry = pinEntry.slice(0,-1); }
+          else if (lbl === "OK"){ checkPin(); return; }
+          else if (pinEntry.length < 4){ pinEntry += lbl; }
+          renderPinDots();
+          if (pinEntry.length === 4) checkPin();
+        });
+        keys.appendChild(k);
+      })(labels[i]);
+    }
+  }
+  function checkPin(){
+    if (pinEntry === PIN){
+      pinEntry = ""; renderPinDots();
+      if (pinPurpose === "skipbreak"){
+        pinPurpose = "settings";
+        closeSettings();
+        endBreak();
+        return;
+      }
+      $("pinView").classList.add("hidden");
+      $("setView").classList.remove("hidden");
+    } else {
+      $("pinErr").textContent = "Try again";
+      pinEntry = ""; renderPinDots();
+    }
+  }
+  function buildLevelGrid(){
+    var grid = $("levelGrid"); grid.innerHTML = "";
+    var items = BANK.concat([EVERYTHING]);
+    for (var i=0;i<items.length;i++){
+      (function(idx, item){
+        var btn = document.createElement("button");
+        btn.className = "lvlbtn" + (idx === levelIndex ? " sel" : "");
+        btn.innerHTML = '<span class="e">'+item.emoji+'</span><span>'+item.name+'<span class="ct">'+item.words.length+' words</span></span>';
+        btn.addEventListener("click", function(){
+          levelIndex = idx; save("anu_level", String(idx));
+          buildQueue(); renderHeader(); renderWord();
+          var all = grid.getElementsByClassName("lvlbtn");
+          for (var j=0;j<all.length;j++) all[j].classList.remove("sel");
+          btn.classList.add("sel");
+        });
+        grid.appendChild(btn);
+      })(i, items[i]);
+    }
+  }
+  function openSettings(){
+    pinEntry = ""; renderPinDots();
+    $("pinErr").textContent = "";
+    $("pinView").classList.remove("hidden");
+    $("setView").classList.add("hidden");
+    $("overlay").classList.add("open");
+  }
+  function closeSettings(){ $("overlay").classList.remove("open"); }
+
+  $("gearBtn").addEventListener("click", function(){ pinPurpose = "settings"; openSettings(); });
+  $("pinCancel").addEventListener("click", closeSettings);
+  $("closeSet").addEventListener("click", closeSettings);
+  $("resetStars").addEventListener("click", function(){
+    stars = 0; save("anu_stars","0"); starNumEl.textContent = "0";
+    toast("Stars reset ✨");
+  });
+  $("overlay").addEventListener("click", function(e){ if (e.target === $("overlay")) closeSettings(); });
+
+  /* ---------- Go ---------- */
+  initRecog();
+  buildKeys();
+  buildLevelGrid();
+  buildQueue();
+  renderHeader();
+  renderWord();
+  // If the page reloaded during a rest, resume the countdown where it left off.
+  var savedUntil = parseInt(load("anu_break_until","0"),10);
+  if (savedUntil && savedUntil > Date.now()){ showBreak(savedUntil); }
+})();
+</script>
+</body>
+</html>
