@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF7EC">
-<title>Anu's Reading Words+</title>
+<title>Anu's Reading Words</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
@@ -168,58 +168,48 @@
   .hidden{display:none !important;}
   .err{color:var(--pink); font-weight:600; min-height:20px; margin-top:8px;}
 
-  /* ---- Say-it (mic) round ---- */
-  .mic{
-    flex:1; border:none; cursor:pointer; color:#fff;
-    font-family:'Fredoka'; font-weight:700; font-size:22px;
-    padding:22px 10px; border-radius:24px; line-height:1.1;
-    background:var(--purple); box-shadow:0 8px 0 #5a3fd6;
-    display:flex; align-items:center; justify-content:center; gap:10px;
+  /* ---- Mic round ---- */
+  #micView, #breakView{
+    background:radial-gradient(120% 80% at 50% -10%, #FFFDF8 0%, var(--paper) 45%, var(--paper2) 100%);
   }
-  .mic:active{transform:translateY(5px); box-shadow:0 3px 0 #5a3fd6;}
-  .mic .ico{font-size:26px;}
-  .mic.listening{background:var(--pink); box-shadow:0 8px 0 #d83f6c; animation:pulse 1s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
-  .say-skip{
-    flex:0 0 auto; border:none; background:transparent; cursor:pointer;
-    font-family:'Fredoka'; font-weight:600; font-size:15px; color:var(--ink-soft);
-    padding:0 14px; text-decoration:underline;
+  .micbox{width:100%; max-width:460px; text-align:center;}
+  .mic-eyebrow{font-weight:700; font-size:21px; color:var(--purple); letter-spacing:.3px;}
+  .mic-instruction{font-size:18px; color:var(--ink-soft); margin:6px 0 18px; font-weight:600;}
+  .mic-word{
+    font-family:'Andika', sans-serif; font-weight:700; color:var(--ink);
+    font-size:clamp(64px,22vw,124px); line-height:1; margin-bottom:26px; letter-spacing:2px;
   }
-  .coach{
-    position:absolute; left:50%; transform:translateX(-50%); bottom:100%;
-    margin-bottom:10px; background:var(--ink); color:#fff; font-size:14px; font-weight:500;
-    padding:9px 14px; border-radius:14px; white-space:nowrap; box-shadow:0 8px 18px rgba(0,0,0,.25);
+  .micbtn{
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    width:172px; height:172px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--purple); color:#fff; font-family:'Fredoka'; font-weight:700; font-size:18px;
+    box-shadow:0 12px 0 #5a3fd6, 0 18px 30px rgba(124,92,255,.40);
   }
-  .coach:after{content:""; position:absolute; left:50%; top:100%; transform:translateX(-50%);
-    border:7px solid transparent; border-top-color:var(--ink);}
-
-  /* ---- Break screen ---- */
-  .break{
-    position:fixed; inset:0; z-index:90; display:none;
-    flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:28px;
-    background:radial-gradient(120% 90% at 50% 0%, #EAFBF1 0%, #Dff3Fb 55%, #E9E6FF 100%);
+  .micbtn .mic-ico{font-size:54px; line-height:1;}
+  .micbtn:active{transform:translateY(6px); box-shadow:0 6px 0 #5a3fd6;}
+  .micbtn.listening{
+    background:var(--pink); box-shadow:0 12px 0 #d63b6e, 0 0 0 0 rgba(255,92,138,.6);
+    animation:pulse 1.15s ease-out infinite;
   }
-  .break.open{display:flex;}
-  .break .leaf{font-size:64px; margin-bottom:6px;}
-  .break h2{font-family:'Fredoka'; font-weight:700; font-size:30px; margin:4px 0; color:var(--ink);}
-  .break p{color:var(--ink-soft); font-size:17px; margin:0 0 18px; max-width:300px;}
-  .break .count{
-    font-family:'Fredoka'; font-weight:700; font-size:60px; color:var(--purple);
-    background:#fff; border-radius:28px; padding:14px 34px; min-width:200px;
-    box-shadow:0 14px 0 rgba(124,92,255,.18), 0 20px 36px rgba(51,41,74,.14); letter-spacing:1px;
+  @keyframes pulse{
+    0%{box-shadow:0 12px 0 #d63b6e, 0 0 0 0 rgba(255,92,138,.55);}
+    70%{box-shadow:0 12px 0 #d63b6e, 0 0 0 28px rgba(255,92,138,0);}
+    100%{box-shadow:0 12px 0 #d63b6e, 0 0 0 0 rgba(255,92,138,0);}
   }
-  .break .resume{
-    margin-top:24px; border:none; cursor:pointer; color:#fff; background:var(--go);
-    font-family:'Fredoka'; font-weight:700; font-size:22px; padding:18px 40px;
-    border-radius:22px; box-shadow:0 8px 0 var(--go-dark);
+  .mic-status{min-height:28px; margin-top:18px; font-weight:600; font-size:18px; color:var(--ink-soft);}
+  /* ---- Break ---- */
+  .breakbox{width:100%; max-width:460px; text-align:center;}
+  .break-emoji{font-size:66px; line-height:1;}
+  .break-title{font-family:'Fredoka'; font-weight:700; font-size:30px; color:var(--ink); margin-top:8px;}
+  .break-sub{font-size:18px; color:var(--ink-soft); margin:6px 0 14px; font-weight:600;}
+  .break-time{
+    font-family:'Fredoka'; font-weight:700; font-size:66px; color:var(--purple);
+    margin-bottom:26px; font-variant-numeric:tabular-nums; letter-spacing:1px;
   }
-  .break .resume:active{transform:translateY(5px); box-shadow:0 3px 0 var(--go-dark);}
-  .break .skip{margin-top:20px; border:none; background:transparent; cursor:pointer;
-    font-family:'Fredoka'; font-weight:600; font-size:14px; color:var(--ink-soft); text-decoration:underline;}
 
   @media (prefers-reduced-motion: reduce){
-    .pop,.conf{animation:none;}
-    .big:active,.gear:active,.hear:active,.said:active{transform:none;}
+    .pop,.conf,.micbtn.listening{animation:none;}
+    .big:active,.gear:active,.hear:active,.said:active,.micbtn:active{transform:none;}
   }
 </style>
 </head>
@@ -246,25 +236,32 @@
   <div class="actions hidden" id="helpActions">
     <button class="big said" id="saidItBtn">I said it! ✅<small>now your turn</small></button>
   </div>
-  <div class="actions hidden" id="sayActions" style="position:relative;">
-    <div class="coach hidden" id="coach">Tap the mic, then say the word 🎤</div>
-    <button class="mic" id="micBtn"><span class="ico">🎤</span><span id="micLabel">Tap &amp; say it</span></button>
-    <button class="say-skip" id="saySkip">Skip ▸</button>
+</div>
+
+<!-- Mic round -->
+<div class="overlay" id="micView">
+  <div class="micbox">
+    <div class="mic-eyebrow">🎤 Show me!</div>
+    <div class="mic-instruction" id="micPrompt">Tap the mic and say it</div>
+    <div class="mic-word" id="micWord">cat</div>
+    <button class="micbtn" id="micBtn"><span class="mic-ico" id="micIco">🎤</span><span id="micBtnLabel">Tap &amp; say it</span></button>
+    <div class="mic-status" id="micStatus"></div>
+  </div>
+</div>
+
+<!-- Break -->
+<div class="overlay" id="breakView">
+  <div class="breakbox">
+    <div class="break-emoji">🌿</div>
+    <div class="break-title">Great work, Anu!</div>
+    <div class="break-sub" id="breakSub">Time for a little rest.</div>
+    <div class="break-time" id="breakTime">5:00</div>
+    <button class="big said" id="breakBtn" style="max-width:280px; margin:0 auto;">I'm ready! ▶</button>
   </div>
 </div>
 
 <div class="confetti" id="confetti"></div>
 <div class="toast" id="toast"></div>
-
-<!-- Break screen -->
-<div class="break" id="breakScreen">
-  <div class="leaf">🌿</div>
-  <h2>Break time!</h2>
-  <p>Great reading, Anu! Rest your eyes, stretch, and get some water. 💧</p>
-  <div class="count" id="breakCount">10:00</div>
-  <button class="resume hidden" id="breakResume">Let's keep reading ▶️</button>
-  <button class="skip" id="breakSkip">Grown-ups: skip break</button>
-</div>
 
 <!-- Settings -->
 <div class="overlay" id="overlay">
@@ -339,45 +336,20 @@
   var mode = "try";        // "try" | "help"
   var speaking = false;
   var seq = 0;             // sequence id: bumped whenever the word or audio changes
-
-  /* ---------- Plus: cycle + speech-recognition config ---------- */
-  var WORDS_PER_CYCLE = 10;            // read this many, then a "say it" round
-  var BREAK_MS = 10 * 60 * 1000;       // 10-minute rest after each round
-  var wordsDone = 0;                   // completed words in the current cycle
-  var recentWords = [];                // words from this cycle (say-it picks one)
-  var sayTarget = "";                  // current say-it word
-  var sayTries = 0;
-  var pinPurpose = "settings";         // "settings" | "skipbreak"
-  var breakInterval = null;
-  var coachShown = false;
-
-  var Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var recogSupported = !!Recog;
-  var recog = null, recognizing = false, micDenied = false, listenTimer = null;
-
-  // Words too ambiguous for a recognizer to score fairly — still practiced,
-  // just never chosen as the "say it" target.
-  var SKIP_SAYIT = {a:1,i:1,oh:1,ax:1,ox:1,aw:1,eh:1,uh:1,hm:1};
-  // Accept close-sounding answers so a 5-year-old isn't fought by homophones.
-  var HOMOPHONES = {
-    to:["too","two"], too:["to","two"], two:["to","too"],
-    "for":["four","fore"], four:["for","fore"],
-    by:["buy","bye"], buy:["by","bye"],
-    be:["bee"], bee:["be"], no:["know"], know:["no"],
-    or:["oar","ore"], hi:["high"], high:["hi"], "in":["inn"], inn:["in"],
-    we:["wee"], wee:["we"], see:["sea"], sea:["see"], hear:["here"], here:["hear"],
-    one:["won"], won:["one"], red:["read"], road:["rode"], rode:["road"],
-    sun:["son"], son:["sun"], maid:["made"], made:["maid"],
-    tail:["tale"], sail:["sale"], mail:["male"], beat:["beet"],
-    deer:["dear"], dear:["deer"], meat:["meet"], meet:["meat"], week:["weak"], weak:["week"]
-  };
+  var readCount = 0;       // confident "I read it!" taps in the current block
+  var recent = [];         // words read this block (mic round picks from these)
+  var WORDS_PER_ROUND = 10;
+  var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recogOK = !!Rec;
+  var micDenied = false;
+  var micTarget = "", micAttempts = 0, micPending = false, micTimer = null, recog = null;
+  var breakTimer = null, breakSecs = 300;
 
   /* ---------- Elements ---------- */
   var $ = function(id){ return document.getElementById(id); };
   var wordEl = $("word"), promptEl = $("prompt");
   var lvlNameEl = $("lvlName"), lvlEmojiEl = $("lvlEmoji"), starNumEl = $("starNum");
   var tryActions = $("tryActions"), helpActions = $("helpActions");
-  var sayActions = $("sayActions");
 
   /* ---------- Speech ---------- */
   var voice = null;
@@ -438,8 +410,9 @@
     lvlEmojiEl.textContent = L.emoji;
     starNumEl.textContent = stars;
   }
-  function paintWord(w){
+  function renderWord(){
     seq++;                 // cancel any spell sequence tied to the previous word
+    var w = queue[qi];
     // Size the word to its length so 4-letter words stay on one line on phones.
     wordEl.style.fontSize = w.length >= 4 ? "clamp(56px,17vw,108px)"
                           : (w.length === 3 ? "clamp(76px,26vw,140px)"
@@ -451,9 +424,6 @@
       wordEl.appendChild(s);
     }
     wordEl.classList.remove("pop"); void wordEl.offsetWidth; wordEl.classList.add("pop");
-  }
-  function renderWord(){
-    paintWord(queue[qi]);
     setTryMode();
   }
   function setTryMode(){
@@ -461,21 +431,12 @@
     promptEl.textContent = "Read it out loud 👀";
     tryActions.classList.remove("hidden");
     helpActions.classList.add("hidden");
-    sayActions.classList.add("hidden");
   }
   function setHelpMode(){
     mode = "help";
     promptEl.textContent = "Say it with me! 🗣️";
     tryActions.classList.add("hidden");
     helpActions.classList.remove("hidden");
-    sayActions.classList.add("hidden");
-  }
-  function setSayMode(){
-    mode = "say";
-    promptEl.textContent = "🎤 Say this word!";
-    tryActions.classList.add("hidden");
-    helpActions.classList.add("hidden");
-    sayActions.classList.remove("hidden");
   }
 
   /* ---------- Sound it out: highlight each letter in time with audio ---------- */
@@ -483,8 +444,8 @@
     var ls = wordEl.getElementsByClassName("ltr");
     for (var i=0;i<ls.length;i++) ls[i].classList.remove("lit");
   }
-  function spellOut(word, done){
-    var w = word || queue[qi];
+  function spellOut(done){
+    var w = queue[qi];
     var ls = wordEl.getElementsByClassName("ltr");
     var mine = ++seq;      // claim this sequence; any newer word/tap cancels it
     clearLit();
@@ -539,9 +500,12 @@
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function(){ t.classList.remove("show"); }, ref ? 3200 : 1500);
   }
-  function awardStar(){
+  function giveStar(){
     stars++; save("anu_stars", String(stars)); starNumEl.textContent = stars;
     confetti();
+  }
+  function awardStar(){
+    giveStar();
     if (stars % 10 === 0){
       var sc = SCRIPTURE[Math.floor((stars/10 - 1)) % SCRIPTURE.length];
       toast(sc.t, sc.r);
@@ -563,172 +527,18 @@
     renderWord();
   }
 
-  /* ---------- Cycle: complete a word, then every 10 → say-it → break ---------- */
-  function completeWord(){
-    if (mode !== "try" && mode !== "help") return;   // ignore taps outside the read flow
-    mode = "wait";                                    // debounce: block a second tap until next render
-    var w = queue[qi];
-    stopSpeech();
-    awardStar();
-    recentWords.push(w);
-    wordsDone++;
-    setTimeout(function(){
-      if (wordsDone >= WORDS_PER_CYCLE){ startSayIt(); }
-      else { next(); }
-    }, 650);
-  }
-
-  /* ---------- Say-it (mic) round ---------- */
-  function normalize(s){ return (s||"").toLowerCase().replace(/[^a-z]/g," ").replace(/\s+/g," ").trim(); }
-  function recognizable(w){ return !SKIP_SAYIT[w.toLowerCase()] && /^[a-z]+$/i.test(w); }
-  function saysMatch(transcript, target){
-    var heard = normalize(transcript);
-    if (!heard) return false;
-    var tg = target.toLowerCase();
-    var ok = HOMOPHONES[tg] || [];
-    var parts = heard.split(" ");
-    for (var i=0;i<parts.length;i++){
-      if (parts[i] === tg) return true;
-      for (var j=0;j<ok.length;j++){ if (parts[i] === ok[j]) return true; }
-    }
-    return heard === tg;
-  }
-  function setMicLabel(txt, listening){
-    $("micLabel").textContent = txt;
-    if (listening){ $("micBtn").classList.add("listening"); }
-    else { $("micBtn").classList.remove("listening"); }
-  }
-  function startSayIt(){
-    if (!recogSupported || micDenied){ startBreak(); return; }   // no mic → just rest
-    var pool = [];
-    for (var i=0;i<recentWords.length;i++){ if (recognizable(recentWords[i])) pool.push(recentWords[i]); }
-    if (!pool.length){ startBreak(); return; }
-    sayTarget = pool[Math.floor(Math.random()*pool.length)];
-    sayTries = 0;
-    paintWord(sayTarget);
-    setSayMode();
-    setMicLabel("Tap & say it", false);
-    if (!coachShown){ $("coach").classList.remove("hidden"); coachShown = true; }
-    speak("Can you say this word?", 0.95);
-  }
-  function listen(){
-    if (!recog || recognizing) return;
-    $("coach").classList.add("hidden");
-    promptEl.textContent = "🎤 Listening…";
-    setMicLabel("Listening…", true);
-    try { recog.start(); recognizing = true; }
-    catch(e){ /* start() throws if already running; ignore */ }
-    if (listenTimer) clearTimeout(listenTimer);
-    listenTimer = setTimeout(function(){ try{ recog.stop(); }catch(e){} }, 7000);
-  }
-  function sayItWin(){
-    setMicLabel("Tap & say it", false);
-    promptEl.textContent = "🎤 Say this word!";
-    awardStar();
-    speak("Yes! You said " + sayTarget + "!", 0.95);
-    toast("Perfect! 🎉");
-    setTimeout(startBreak, 1500);
-  }
-  function sayItMiss(){
-    sayTries++;
-    setMicLabel("Tap & say it", false);
-    if (sayTries >= 2){ sayItTogether(); return; }
-    promptEl.textContent = "Let's try again 🎤";
-    speak("Let's try again", 0.95, function(){ setTimeout(listen, 300); });
-  }
-  function sayItTogether(){
-    promptEl.textContent = "Let's say it together! 🗣️";
-    setMicLabel("Tap & say it", false);
-    var w = sayTarget;
-    speak("Let's say it together.", 0.95, function(){
-      spellOut(w, function(){
-        awardStar();                       // a star for trying
-        toast("Good trying! ⭐");
-        setTimeout(startBreak, 900);
-      });
-    });
-  }
-  function micUnavailable(){
-    micDenied = true;
-    toast("Microphone is off — we'll keep tapping 👍");
-    setTimeout(startBreak, 1300);
-  }
-  function initRecog(){
-    if (!recogSupported) return;
-    recog = new Recog();
-    recog.lang = "en-US";
-    recog.interimResults = false;
-    recog.maxAlternatives = 6;
-    recog.continuous = false;
-    recog.onresult = function(e){
-      recognizing = false;
-      if (listenTimer) clearTimeout(listenTimer);
-      if (mode !== "say") return;
-      var matched = false;
-      try {
-        var res = e.results[0];
-        for (var j=0;j<res.length;j++){ if (saysMatch(res[j].transcript, sayTarget)){ matched = true; break; } }
-      } catch(err){}
-      if (matched) sayItWin(); else sayItMiss();
-    };
-    recog.onerror = function(e){
-      recognizing = false;
-      if (listenTimer) clearTimeout(listenTimer);
-      if (mode !== "say") return;
-      if (e.error === "not-allowed" || e.error === "service-not-allowed"){ micUnavailable(); return; }
-      if (e.error === "aborted"){ setMicLabel("Tap & say it", false); return; }
-      if (e.error === "no-speech"){ sayItMiss(); return; }
-      sayItTogether();   // network/other → don't punish a child
-    };
-    recog.onend = function(){
-      recognizing = false;
-      $("micBtn").classList.remove("listening");
-      if ($("micLabel").textContent === "Listening…"){ $("micLabel").textContent = "Tap & say it"; }
-      if (mode === "say" && promptEl.textContent === "🎤 Listening…"){ promptEl.textContent = "🎤 Tap the mic and say it!"; }
-    };
-  }
-
-  /* ---------- Break ---------- */
-  function fmt(ms){
-    if (ms < 0) ms = 0;
-    var total = Math.round(ms/1000);
-    var m = Math.floor(total/60), s = total % 60;
-    return m + ":" + (s < 10 ? "0"+s : s);
-  }
-  function startBreak(){
-    stopSpeech();
-    wordsDone = 0; recentWords = [];
-    var until = Date.now() + BREAK_MS;
-    save("anu_break_until", String(until));
-    showBreak(until);
-  }
-  function showBreak(until){
-    mode = "break";
-    $("breakResume").classList.add("hidden");
-    $("breakScreen").classList.add("open");
-    if (breakInterval) clearInterval(breakInterval);
-    function tick(){
-      var ms = until - Date.now();
-      $("breakCount").textContent = fmt(ms);
-      if (ms <= 0){
-        clearInterval(breakInterval); breakInterval = null;
-        $("breakCount").textContent = "0:00";
-        $("breakResume").classList.remove("hidden");
-        speak("Break is over! Ready to read?", 0.95);
-      }
-    }
-    tick();
-    breakInterval = setInterval(tick, 1000);
-  }
-  function endBreak(){
-    if (breakInterval){ clearInterval(breakInterval); breakInterval = null; }
-    save("anu_break_until", "0");
-    $("breakScreen").classList.remove("open");
-    next();
-  }
-
   /* ---------- Events: main loop ---------- */
-  $("gotItBtn").addEventListener("click", completeWord);
+  $("gotItBtn").addEventListener("click", function(){
+    stopSpeech();
+    awardStar();
+    recent.push(queue[qi]);
+    readCount++;
+    if (readCount % WORDS_PER_ROUND === 0){
+      setTimeout(startMicRound, 800);   // checkpoint after the praise
+    } else {
+      setTimeout(next, 650);
+    }
+  });
   $("helpBtn").addEventListener("click", function(){
     stopSpeech();
     setHelpMode();
@@ -739,18 +549,153 @@
       setTimeout(function(){ if (mySeq === seq) spellOut(); }, 200);
     });
   });
-  $("saidItBtn").addEventListener("click", completeWord);
+  $("saidItBtn").addEventListener("click", function(){
+    stopSpeech();
+    awardStar();
+    setTimeout(next, 650);
+  });
   $("hearBtn").addEventListener("click", function(){
     stopSpeech();
     spellOut();
   });
-  $("micBtn").addEventListener("click", function(){ if (mode === "say") listen(); });
-  $("saySkip").addEventListener("click", function(){
-    if (recognizing){ try{ recog.abort(); }catch(e){} recognizing = false; }
-    startBreak();
+
+  /* ---------- Mic round (Web Speech recognition; Chrome) ---------- */
+  var HOMO = {
+    to:["two","too"], two:["to","too"], too:["to","two"], "for":["four","fore"], four:["for","fore"],
+    by:["bye","buy"], buy:["by","bye"], be:["bee"], bee:["be"], i:["eye","aye"], eye:["i","aye"],
+    or:["oar","ore"], no:["know"], know:["no"], one:["won"], won:["one"], hi:["high"], high:["hi"],
+    so:["sew","sow"], we:["wee"], wee:["we"], "in":["inn"], inn:["in"], see:["sea"], sea:["see"],
+    sun:["son"], son:["sun"], red:["read"], our:["are","hour"], ate:["eight"],
+    hear:["here"], here:["hear"], deer:["dear"], dear:["deer"], rose:["rows"], nose:["knows"],
+    tail:["tale"], tale:["tail"], mail:["male"], male:["mail"], pale:["pail"], pail:["pale"],
+    road:["rode"], way:["weigh"], wait:["weight"], meat:["meet"], meet:["meat"], week:["weak"], weak:["week"]
+  };
+  function norm(s){ return (s||"").toLowerCase().replace(/[^a-z]/g,""); }
+  function matchWord(target, transcript){
+    var t = norm(target); if (!t) return false;
+    var heard = (transcript||"").toLowerCase().split(/[^a-z]+/);
+    var homo = HOMO[t] || [];
+    for (var i=0;i<heard.length;i++){
+      var h = heard[i]; if (!h) continue;
+      if (h === t) return true;
+      for (var j=0;j<homo.length;j++){ if (h === homo[j]) return true; }
+    }
+    return false;
+  }
+  function micSetUI(label, status, listening){
+    $("micBtnLabel").textContent = label;
+    $("micStatus").textContent = status || "";
+    if (listening) $("micBtn").classList.add("listening");
+    else $("micBtn").classList.remove("listening");
+  }
+  function startMicRound(){
+    stopSpeech();
+    micTarget = recent.length ? recent[Math.floor(Math.random()*recent.length)] : queue[qi];
+    micAttempts = 0; micPending = false;
+    $("micWord").textContent = micTarget;
+    $("micBtn").classList.remove("listening");
+    if (recogOK && !micDenied){
+      $("micPrompt").textContent = "Tap the mic and say it";
+      micSetUI("Tap & say it", "", false);
+    } else {
+      $("micPrompt").textContent = "Say it out loud, then tap";
+      micSetUI("I said it! \u2B50", "", false);
+    }
+    $("micView").classList.add("open");
+    speak("Can you say this word?", 0.9, function(){
+      setTimeout(function(){ speak(micTarget, 0.8); }, 150);
+    });
+  }
+  function micListen(){
+    if (!recogOK || micDenied){ micWin(); return; }
+    if (micPending) return;
+    micPending = true;
+    try{
+      recog = new Rec();
+      recog.lang = "en-US"; recog.interimResults = false;
+      recog.maxAlternatives = 5; recog.continuous = false;
+      recog.onresult = function(e){
+        var ok = false, alts = e.results[0], k;
+        for (k=0;k<alts.length;k++){ if (matchWord(micTarget, alts[k].transcript)){ ok = true; break; } }
+        micResolve(ok);
+      };
+      recog.onerror = function(e){
+        if (e && (e.error === "not-allowed" || e.error === "service-not-allowed")){
+          micDenied = true; micPending = false;
+          micSetUI("I said it! \u2B50", "Mic is off \u2014 just tap", false);
+          return;
+        }
+        micResolve(false);
+      };
+      recog.onend = function(){ if (micPending){ micResolve(false); } };
+      recog.start();
+      micSetUI("Listening\u2026", "I'm listening \uD83C\uDF99\uFE0F", true);
+      if (micTimer) clearTimeout(micTimer);
+      micTimer = setTimeout(function(){ try{ recog.stop(); }catch(e){} }, 7000);
+    }catch(err){ micResolve(false); }
+  }
+  function micResolve(ok){
+    if (!micPending) return;          // first signal wins; ignore the rest
+    micPending = false;
+    if (micTimer){ clearTimeout(micTimer); micTimer = null; }
+    try{ if (recog){ recog.onresult = recog.onerror = recog.onend = null; } }catch(e){}
+    $("micBtn").classList.remove("listening");
+    if (ok){ micWin(); return; }
+    micAttempts++;
+    if (micAttempts < 2){
+      micSetUI("Try again", "Let's try again \uD83C\uDFA4", false);
+      speak("Try again!", 0.95);
+    } else {
+      micGiveUp();
+    }
+  }
+  function micWin(){
+    giveStar();
+    micSetUI("Yes! \uD83C\uDF1F", "You said " + micTarget + "!", false);
+    speak("Yes! You said " + micTarget + "!", 0.92);
+    setTimeout(function(){ $("micView").classList.remove("open"); startBreak(); }, 1700);
+  }
+  function micGiveUp(){
+    giveStar();
+    micSetUI("Good try! \u2B50", "Let's say it together", false);
+    speak("Let's say it together. " + micTarget + ". " + micTarget + ".", 0.78);
+    setTimeout(function(){ $("micView").classList.remove("open"); startBreak(); }, 2300);
+  }
+  $("micBtn").addEventListener("click", function(){
+    if (micPending){ return; }
+    if (recogOK && !micDenied){ micListen(); }
+    else { micWin(); }                // no recognition available -> trust the tap
   });
-  $("breakResume").addEventListener("click", endBreak);
-  $("breakSkip").addEventListener("click", function(){ pinPurpose = "skipbreak"; openSettings(); });
+
+  /* ---------- Break ---------- */
+  function fmtTime(s){ var m = Math.floor(s/60), ss = s % 60; return m + ":" + (ss < 10 ? "0" : "") + ss; }
+  function startBreak(){
+    stopSpeech();
+    breakSecs = 300;
+    $("breakSub").textContent = "Time for a little rest.";
+    $("breakTime").textContent = fmtTime(breakSecs);
+    $("breakBtn").textContent = "I'm ready! \u25B6";
+    $("breakView").classList.add("open");
+    speak("Great work! Take a little rest.", 0.9);
+    if (breakTimer) clearInterval(breakTimer);
+    breakTimer = setInterval(function(){
+      breakSecs--;
+      if (breakSecs <= 0){
+        breakSecs = 0; clearInterval(breakTimer); breakTimer = null;
+        $("breakTime").textContent = "0:00";
+        $("breakSub").textContent = "Break's over \u2014 tap when you're ready!";
+      } else {
+        $("breakTime").textContent = fmtTime(breakSecs);
+      }
+    }, 1000);
+  }
+  function endBreak(){
+    if (breakTimer){ clearInterval(breakTimer); breakTimer = null; }
+    $("breakView").classList.remove("open");
+    recent = [];                      // fresh block of 10
+    next();
+  }
+  $("breakBtn").addEventListener("click", endBreak);
 
   /* ---------- Settings + PIN ---------- */
   var pinEntry = "";
@@ -780,12 +725,6 @@
   function checkPin(){
     if (pinEntry === PIN){
       pinEntry = ""; renderPinDots();
-      if (pinPurpose === "skipbreak"){
-        pinPurpose = "settings";
-        closeSettings();
-        endBreak();
-        return;
-      }
       $("pinView").classList.add("hidden");
       $("setView").classList.remove("hidden");
     } else {
@@ -821,7 +760,7 @@
   }
   function closeSettings(){ $("overlay").classList.remove("open"); }
 
-  $("gearBtn").addEventListener("click", function(){ pinPurpose = "settings"; openSettings(); });
+  $("gearBtn").addEventListener("click", openSettings);
   $("pinCancel").addEventListener("click", closeSettings);
   $("closeSet").addEventListener("click", closeSettings);
   $("resetStars").addEventListener("click", function(){
@@ -831,15 +770,11 @@
   $("overlay").addEventListener("click", function(e){ if (e.target === $("overlay")) closeSettings(); });
 
   /* ---------- Go ---------- */
-  initRecog();
   buildKeys();
   buildLevelGrid();
   buildQueue();
   renderHeader();
   renderWord();
-  // If the page reloaded during a rest, resume the countdown where it left off.
-  var savedUntil = parseInt(load("anu_break_until","0"),10);
-  if (savedUntil && savedUntil > Date.now()){ showBreak(savedUntil); }
 })();
 </script>
 </body>
