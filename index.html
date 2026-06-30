@@ -174,6 +174,8 @@
   }
   .micbox{width:100%; max-width:460px; text-align:center;}
   .mic-eyebrow{font-weight:700; font-size:21px; color:var(--purple); letter-spacing:.3px;}
+  .mic-progress{font-weight:700; font-size:15px; color:var(--ink-soft); margin-top:4px;}
+  .mic-dots{font-size:17px; letter-spacing:3px; color:var(--purple); margin:5px 0; min-height:21px; word-break:break-word;}
   .mic-instruction{font-size:18px; color:var(--ink-soft); margin:6px 0 18px; font-weight:600;}
   .mic-word{
     font-family:'Andika', sans-serif; font-weight:700; color:var(--ink);
@@ -242,6 +244,8 @@
 <div class="overlay" id="micView">
   <div class="micbox">
     <div class="mic-eyebrow">🎤 Show me!</div>
+    <div class="mic-progress" id="micProgress">Word 1 of 10</div>
+    <div class="mic-dots" id="micDots"></div>
     <div class="mic-instruction" id="micPrompt">Tap the mic and say it</div>
     <div class="mic-word" id="micWord">cat</div>
     <button class="micbtn" id="micBtn"><span class="mic-ico" id="micIco">🎤</span><span id="micBtnLabel">Tap &amp; say it</span></button>
@@ -342,7 +346,7 @@
   var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
   var recogOK = !!Rec;
   var micDenied = false;
-  var micTarget = "", micAttempts = 0, micPending = false, micTimer = null, recog = null;
+  var micTarget = "", micAttempts = 0, micPending = false, micTimer = null, recog = null, micList = [], micIdx = 0;
   var breakTimer = null, breakSecs = 300;
 
   /* ---------- Elements ---------- */
@@ -590,10 +594,27 @@
   }
   function startMicRound(){
     stopSpeech();
-    micTarget = recent.length ? recent[Math.floor(Math.random()*recent.length)] : queue[qi];
+    micList = recent.slice();
+    if (!micList.length){ micList = [queue[qi]]; }
+    micIdx = 0;
+    $("micView").classList.add("open");
+    speak("Now say the words you read!", 0.92, function(){
+      setTimeout(showMicWord, 300);
+    });
+  }
+  var MIC_CUES = ["Say this word!","Your turn!","What's this word?","Read this one!","Now this one!"];
+  function renderMicProgress(){
+    var n = micList.length, d = "", i;
+    for (i=0;i<n;i++){ d += (i < micIdx ? "\u25CF" : (i === micIdx ? "\u25C9" : "\u25CB")); if (i<n-1) d += " "; }
+    $("micDots").textContent = d;
+    $("micProgress").textContent = "Word " + (micIdx+1) + " of " + n;
+  }
+  function showMicWord(){
+    micTarget = micList[micIdx];
     micAttempts = 0; micPending = false;
     $("micWord").textContent = micTarget;
     $("micBtn").classList.remove("listening");
+    renderMicProgress();
     if (recogOK && !micDenied){
       $("micPrompt").textContent = "Tap the mic and say it";
       micSetUI("Tap & say it", "", false);
@@ -601,10 +622,16 @@
       $("micPrompt").textContent = "Say it out loud, then tap";
       micSetUI("I said it! \u2B50", "", false);
     }
-    $("micView").classList.add("open");
-    speak("Can you say this word?", 0.9, function(){
-      setTimeout(function(){ speak(micTarget, 0.8); }, 150);
-    });
+    speak(MIC_CUES[micIdx % MIC_CUES.length], 0.95);
+  }
+  function nextMicWord(){
+    micIdx++;
+    if (micIdx >= micList.length){
+      $("micView").classList.remove("open");
+      startBreak();
+    } else {
+      showMicWord();
+    }
   }
   function micListen(){
     if (!recogOK || micDenied){ micWin(); return; }
@@ -652,14 +679,14 @@
   function micWin(){
     giveStar();
     micSetUI("Yes! \uD83C\uDF1F", "You said " + micTarget + "!", false);
-    speak("Yes! You said " + micTarget + "!", 0.92);
-    setTimeout(function(){ $("micView").classList.remove("open"); startBreak(); }, 1700);
+    speak("Yes!", 0.96);
+    setTimeout(nextMicWord, 1300);
   }
   function micGiveUp(){
     giveStar();
-    micSetUI("Good try! \u2B50", "Let's say it together", false);
-    speak("Let's say it together. " + micTarget + ". " + micTarget + ".", 0.78);
-    setTimeout(function(){ $("micView").classList.remove("open"); startBreak(); }, 2300);
+    micSetUI("Good try! \u2B50", "Say it with me: " + micTarget, false);
+    speak("Let's say it together. " + micTarget + ".", 0.78);
+    setTimeout(nextMicWord, 2000);
   }
   $("micBtn").addEventListener("click", function(){
     if (micPending){ return; }
